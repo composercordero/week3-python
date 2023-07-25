@@ -1,12 +1,15 @@
 class Cart():
 
-    def __init__(self, shop_name, payment, shop, total_cart, cart, freebies):
+    def __init__(self, customer_name, shop_name, payment, shop, total_cart, cart, freebies):
+        self.customer_name = customer_name
         self.shop_name = shop_name
         self.payment = payment
         self.shop = shop
         self.total_cart = total_cart
         self.cart = cart
         self.freebies = freebies
+
+        print(f'Welcome to {shop_name}, {customer_name}!\n')
 
     def add(self):
         while True:
@@ -34,13 +37,29 @@ class Cart():
 
             self.cart[add_art] = {'quantity': add_art_num, 'price': Cart.find_price(add_art)}
 
-            wine_pairing = articles['wine']['red'][add_art]["pairing"]
+# IN PROGRESS
+            if add_art in articles['wine']['red']:
+                wine_pairing_red = articles['wine']['red'][add_art]["pairing"]
+            elif add_art in articles['wine']['white']:
+                wine_pairing_white = articles['wine']['white'][add_art]["pairing"]
+            elif add_art in articles['wine']['rose']:
+                wine_pairing_rose = articles['wine']['rose'][add_art]["pairing"]
 
-            if add_art in articles['wine']['red'] or add_art in articles['wine']['white'] or add_art in articles['wine']['rose']:
-                print(f'I see you added {add_art} which goes perfect with {wine_pairing}')
-                add_pairing = input(f'add {wine_pairing} to your cart for free? y/n ').lower().strip()
+            if add_art in articles['wine']['red']:
+                print(f'I see you added {add_art} which goes perfect with {wine_pairing_red}')
+                add_pairing = input(f'add {wine_pairing_red} to your cart for free? y/n ').lower().strip()
                 if add_pairing == 'y':
-                    self.cart[wine_pairing] = {'quantity': 1, 'price': 0}
+                    self.cart[wine_pairing_red] = {'quantity': 1, 'price': 0}
+            elif add_art in articles['wine']['white'] or add_art in articles['wine']['rose']:
+                print(f'I see you added {add_art} which goes perfect with {wine_pairing_white}')
+                add_pairing = input(f'add {wine_pairing_white} to your cart for free? y/n ').lower().strip()
+                if add_pairing == 'y':
+                    self.cart[wine_pairing_white] = {'quantity': 1, 'price': 0}
+            elif add_art in articles['wine']['rose']:
+                print(f'I see you added {add_art} which goes perfect with {wine_pairing_rose}')
+                add_pairing = input(f'add {wine_pairing_rose} to your cart for free? y/n ').lower().strip()
+                if add_pairing == 'y':
+                    self.cart[wine_pairing_rose] = {'quantity': 1, 'price': 0}
             
             Cart.view_cart(self)
             
@@ -193,24 +212,24 @@ articles = {
         'white':{
             'chardonnay':{
                 'price': 10,
-                'paring': 'cheddar',
+                'pairing': 'cheddar',
                 'year': 2021                
             },
             'sauvignon blanc': {
                 'price': 12,
-                'paring': 'aged gouda',
+                'pairing': 'aged gouda',
                 'year': 2022
             }
         },
         'rose':{
             'malbec rose':{
                 'price': 13,
-                'paring': 'cheddar',
+                'pairing': 'cheddar',
                 'year': 2020                
             },
             'pinot grigio rose': {
                 'price': 20,
-                'paring': 'brie',
+                'pairing': 'brie',
                 'year': 2018
             }
         }
@@ -230,9 +249,9 @@ articles = {
 wine_shop_freebies = ['wine glass', 'coaster', 'colored lightbulb']
 
 def main():
+    name = input('What is your name? ')
+    my_cart = Cart(name, 'That Annoying Wine Shop', 'pending', 'open',0, {}, wine_shop_freebies)
     
-    my_cart = Cart('That Annoying Wine Shop', 'pending', 'open',0, {}, wine_shop_freebies)
-    print(f'Welcome to {my_cart.shop_name}!\n')
     while my_cart.shop == 'open':
         action = input('What would you like to do? Add, Delete, View Cart, Pay, Leave: ').lower().strip()
 
