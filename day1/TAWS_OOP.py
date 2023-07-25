@@ -1,7 +1,12 @@
 class Cart():
 
-    def __init__(self):
-        pass
+    def __init__(self, shop_name, payment, shop, total_cart, cart, freebies):
+        self.shop_name = shop_name
+        self.payment = payment
+        self.shop = shop
+        self.total_cart = total_cart
+        self.cart = cart
+        self.freebies = freebies
 
     def add(self):
         while True:
@@ -25,11 +30,19 @@ class Cart():
             add_art_more = input('add two more article y/n? ').lower().strip()
             if add_art_more == 'y':
                 add_art_num = int(add_art_num) + 2
-                Cart.freebie()
+                Cart.freebie(self)
 
-            cart[add_art] = {'quantity': add_art_num, 'price': Cart.find_price(add_art)}
-        
-            Cart.view_cart()
+            self.cart[add_art] = {'quantity': add_art_num, 'price': Cart.find_price(add_art)}
+
+            wine_pairing = articles['wine']['red'][add_art]["pairing"]
+
+            if add_art in articles['wine']['red'] or add_art in articles['wine']['white'] or add_art in articles['wine']['rose']:
+                print(f'I see you added {add_art} which goes perfect with {wine_pairing}')
+                add_pairing = input(f'add {wine_pairing} to your cart for free? y/n ').lower().strip()
+                if add_pairing == 'y':
+                    self.cart[wine_pairing] = {'quantity': 1, 'price': 0}
+            
+            Cart.view_cart(self)
             
             add_art_cont = input('Would you like to add more articles to your cart? y/n: ').lower().strip()
             
@@ -40,65 +53,65 @@ class Cart():
                 break
 
     def delete(self):
-        if cart == {}:
+        if self.cart == {}:
             print('\nYour shopping cart is empty. Time to put some wine there :)')
         else:
-            Cart.view_cart()
+            Cart.view_cart(self)
 
             del_art = input('What article would you like to delete? ')
 
-            while del_art not in cart:
+            while del_art not in self.cart:
                 del_art = input('Enter an article in your cart: ')
 
             del_art_num = input('How many would you like to delete? ')
             del_conf = input("are you sure you'd like to delete this many articles from your shopping cart? y/n ")
 
-            if int(cart[del_art]['quantity']) - int(del_art_num) == 0:
-                del cart[del_art]
+            if int(self.cart[del_art]['quantity']) - int(del_art_num) == 0:
+                del self.cart[del_art]
                 return print(f"You've deleted {del_art} from your cart")
             else:
-                cart[del_art]['quantity'] = int(cart[del_art]['quantity']) - int(del_art_num)
-            Cart.view_cart()
+                self.cart[del_art]['quantity'] = int(self.cart[del_art]['quantity']) - int(del_art_num)
+            Cart.view_cart(self)
 
     def pay(self):
         print('Your cart:\n')
-        Cart.view_cart()
-        Cart.total() 
+        Cart.view_cart(self)
+        Cart.total(self) 
         
         while True:
             method_of_payment = input('Method of payment - credit card, apple pay, or cash? ')
             if method_of_payment == 'credit card' or method_of_payment == 'apple pay':
-                Cart.all_set()
+                Cart.all_set(self)
                 break    
             elif method_of_payment == 'cash':
 
                     cash = input('Enter the amount of cash: ')
                     if int(cash) == total_cart:
-                        return Cart.all_set()
+                        return Cart.all_set(self)
                     elif int(cash) > total_cart:
                         print(f'\nThank you for the tip!\n')
-                        return Cart.all_set()
+                        return Cart.all_set(self)
                     else: 
                         print("\nThat's not enough cash.")
 
-    def all_set():
+    def all_set(self):
         print('You are all set. Thank you for shopping at That Annoying Wine Shop\n')
         print('Here is your Annoying Receipt:')
-        Cart.view_cart()
+        Cart.view_cart(self)
         global shop
-        shop = 'closed'
+        self.shop = 'closed'
 
     def leave(self):
 
-        if cart == {}:
-            print(f'Thank you for coming to {shop_name}. I hope I can annoy you more soon!')
-            shop == 'closed'
+        if self.cart == {}:
+            print(f'Thank you for coming to {self.shop_name}. I hope I can annoy you more soon!')
+            self.shop == 'closed'
         else:   
-            if payment == 'done':
-                Cart.all_set()
+            if self.payment == 'done':
+                Cart.all_set(self)
             else:
                 print('\nRemember to pay :)\n')
-                Cart.pay()
+                Cart.pay(self)
 
     # Display
 
@@ -122,53 +135,46 @@ class Cart():
                 if key == article:
                     print(k.title())
                     
-    def view_cart():
-        if cart == {}:
+    def view_cart(self):
+        if self.cart == {}:
             print('\nYour shopping cart is empty. Time to put some wine there :)\n')
         else:
             print('\n(Qty) Item - Price\n')
-            for key,value in cart.items():
-                qty = int(cart[key].get('quantity'))
-                art_price = int(cart[key].get('price'))
+            for key,value in self.cart.items():
+                qty = int(self.cart[key].get('quantity'))
+                art_price = int(self.cart[key].get('price'))
                 print(f"({qty}) {key.title()} - ${art_price}\n\tTotal: ${art_price * qty}\n")
-            Cart.total()
+            Cart.total(self)
             
-    def total():
+    def total(self):
         global total_cart
         sum = 0
-        for key, value in cart.items():
-            sum += cart[key]['price'] * int(cart[key]['quantity'])
+        for key, value in self.cart.items():
+            sum += self.cart[key]['price'] * int(self.cart[key]['quantity'])
         total_cart = sum
         print(f"\nYour total is: ${total_cart:.2f}")
         
-    def find_price(add_art):
-        if add_art in articles['wine']['red']:
-            return articles['wine']['red'][add_art]['price']
-        elif add_art in articles['wine']['white']:
-            return articles['wine']['white'][add_art]['price']
-        elif add_art in articles['wine']['rose']:
-            return articles['wine']['rose'][add_art]['price']
-        elif add_art in articles['cheese']:
-            return articles['cheese'][add_art]
-        elif add_art in articles['accessories']:
-            return articles['accessories'][add_art]
+    def find_price(item):
+        if item in articles['wine']['red']:
+            return articles['wine']['red'][item]['price']
+        elif item in articles['wine']['white']:
+            return articles['wine']['white'][item]['price']
+        elif item in articles['wine']['rose']:
+            return articles['wine']['rose'][item]['price']
+        elif item in articles['cheese']:
+            return articles['cheese'][item]
+        elif item in articles['accessories']:
+            return articles['accessories'][item]
         
-    def freebie():
-        print(freebies)
+    def freebie(self):
+        print(self.freebies)
         
         select_freebie = input('What freebie would you like? 1, 2, or 3? ')
         
         while select_freebie not in {'1', '2', '3'}:
             select_freebie = input('Select a valid freebie: 1, 2, or 3? ')
         
-        cart[freebies[int(select_freebie) -1]] = {'price': 0, 'quantity': 1}
-
-shop_name = 'That Annoying Wine Shop'
-payment = 'pending'
-shop = 'open'
-welcome = f'Welcome to {shop_name}!'
-total_cart = 0
-cart = {}
+        self.cart[self.freebies[int(select_freebie) -1]] = {'price': 0, 'quantity': 1}
 
 articles = {
     'wine':{
@@ -221,12 +227,13 @@ articles = {
     }
 }
 
-freebies = ['wine glass', 'coaster', 'colored lightbulb']
+wine_shop_freebies = ['wine glass', 'coaster', 'colored lightbulb']
 
 def main():
-    print(f'{welcome}\n')
-    my_cart = Cart()
-    while shop == 'open':
+    
+    my_cart = Cart('That Annoying Wine Shop', 'pending', 'open',0, {}, wine_shop_freebies)
+    print(f'Welcome to {my_cart.shop_name}!\n')
+    while my_cart.shop == 'open':
         action = input('What would you like to do? Add, Delete, View Cart, Pay, Leave: ').lower().strip()
 
         while action not in {'add', 'delete', 'view cart', 'pay', 'leave'}:
@@ -242,7 +249,6 @@ def main():
             my_cart.pay()
         elif action == 'leave':           
             my_cart.leave()
-            cart = {}
             return print(f'\nLet me annoy you again soon!')
         
 main()
