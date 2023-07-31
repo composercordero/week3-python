@@ -2,6 +2,11 @@
 # Missing Random Choice Words (import not working)
 # Missing ending the game if user guesses the word
 
+from random_word import RandomWords
+r = RandomWords()
+
+print(r.get_random_word())
+
 
 class Hangman():
 
@@ -10,20 +15,21 @@ class Hangman():
         self.lives = 6
         self.letters_guessed = []
         self.word_to_guess = ''
-        self.result = ''
         self.count = 0
+        self.game = 'on'
+
     def __str__(self):
-        pass
+        return f'{self.name}'
 
     def __repr__(self):
-        pass
+        return f' User | {self}'
 
     def generate_word(self):
         self.word_to_guess = 'word'
         self.show_word(self.word_to_guess)
 
     def show_word(self, word):
-        sep_word = [" _ " if letter not in self.letters_guessed else f' {letter} ' for letter in self.word_to_guess] 
+        sep_word = [" _ " if letter not in self.letters_guessed else f' {letter} ' for letter in word] 
         print(f'\n{"".join(sep_word)}\n')
 
     def guess_letter(self, letter):
@@ -68,21 +74,19 @@ class Hangman():
                 if play_again == 'y':
                     pass # random choice word new word and lives back to 6
                 elif play_again == 'n':
-                    game = 'off'
+                    self.game == 'off'
         else:
             print(f'YAY, {self.name}! You won.')
-            game = 'off'
+            self.game = 'off'
     
 # -------------------------------------------- GAME -------------------------------------------- #
 
 def game():
     name = input('What\'s your name? ') 
     hangman = Hangman(name)
-    game = 'on'
-    while game == 'on':
-        
+    while hangman.game == 'on':
         hangman.generate_word()
-        hangman.game_status()
+        
         guess = input(f'\nWould you like to guess a letter or the word?\n\t1. letter\n\t2. word \n\t3. quit\n')
         
 # -------------------------------------------- OPTIONS -------------------------------------------- #
@@ -96,6 +100,7 @@ def game():
         elif guess == '3' or guess == 'quit':
             print(f'\nThank you for playing, {hangman.name}.\n')
             break
+        hangman.game_status()
 
 # -------------------------------------------- CALL -------------------------------------------- #
 
